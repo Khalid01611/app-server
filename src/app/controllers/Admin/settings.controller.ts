@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { SMSTemplate } from "../../models/Settings";
+import { SMSTemplate, InvoiceSettings } from "../../models/Settings";
 
 // Create or update SMS template
 export const createOrUpdateSMSTemplate = async (req: Request, res: Response): Promise<Response | any> => {
@@ -411,6 +411,61 @@ export const bulkUpdateTemplates = async (req: Request, res: Response): Promise<
     });
   } catch (error: any) {
     console.error("Error in bulkUpdateTemplates:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
+    });
+  }
+};
+
+// Invoice Settings
+export const createOrUpdateInvoiceSettings = async (req: Request, res: Response): Promise<Response | any> => {
+  try {
+    const { invoiceNumber } = req.body;
+
+    if (!invoiceNumber || !invoiceNumber.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Invoice number is required",
+      });
+    }
+
+    let settings = await InvoiceSettings.findOne();
+    
+    if (settings) {
+      settings.invoiceNumber = invoiceNumber.trim();
+      await settings.save();
+    } else {
+      settings = new InvoiceSettings({ invoiceNumber: invoiceNumber.trim() });
+      await settings.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Invoice settings updated successfully",
+      data: settings,
+    });
+  } catch (error: any) {
+    console.error("Error in createOrUpdateInvoiceSettings:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
+    });
+  }
+};
+
+export const getInvoiceSettings = async (req: Request, res: Response): Promise<Response | any> => {
+  try {
+    const settings = await InvoiceSettings.findOne();
+    
+    return res.status(200).json({
+      success: true,
+      invoiceNumber: settings?.invoiceNumber || "",
+    });
+  } catch (error: any) {
+    console.error("Error in getInvoiceSettings:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

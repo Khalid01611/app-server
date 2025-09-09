@@ -44,6 +44,8 @@ import {
   toggleTemplateStatus,
   deleteSMSTemplate,
   bulkUpdateTemplates,
+  createOrUpdateInvoiceSettings,
+  getInvoiceSettings,
 } from "../app/controllers/Admin/settings.controller";
 
 const route = Router();
@@ -93,5 +95,9 @@ route.get("/sms-template-latest/active", getLatestActiveSMSTemplate);
 route.put("/sms-template/:id/toggle-status", toggleTemplateStatus);
 route.delete("/sms-template/:id", deleteSMSTemplate);
 route.put("/sms-templates/bulk-update", bulkUpdateTemplates);
+
+// Invoice Settings
+route.post("/invoice-settings", createOrUpdateInvoiceSettings);
+route.get("/invoice-settings", getInvoiceSettings);
 
 export default route;

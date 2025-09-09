@@ -6,6 +6,10 @@ export interface ISMSTemplate extends Document {
   isActive?: boolean;
 }
 
+export interface IInvoiceSettings extends Document {
+  invoiceNumber: string;
+}
+
 const smsTemplateSchema = new Schema<ISMSTemplate>(
   {
     title: { type: String, required: true },
@@ -17,4 +21,14 @@ const smsTemplateSchema = new Schema<ISMSTemplate>(
   }
 );
 
+const invoiceSettingsSchema = new Schema<IInvoiceSettings>(
+  {
+    invoiceNumber: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 export const SMSTemplate = model<ISMSTemplate>("SMSTemplate", smsTemplateSchema);
+export const InvoiceSettings = model<IInvoiceSettings>("InvoiceSettings", invoiceSettingsSchema);
