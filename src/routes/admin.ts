@@ -22,6 +22,7 @@ import {
   updateInvoice,
   deleteInvoices,
   exportInvoices,
+  getCustomerByVehicle,
 } from "../app/controllers/Invoice/invoice.controller";
 import {
   getReportStats,
@@ -69,6 +70,7 @@ route.post("/delete/products", deleteProducts);
 // Invoices
 route.get("/get/invoices", getAllInvoices);
 route.get("/get/invoice/:id", getInvoiceById);
+route.get("/get/customer-by-vehicle/:vehicle_no", getCustomerByVehicle);
 route.post("/create/invoice", createInvoice);
 route.put("/update/invoice/:id", updateInvoice);
 route.post("/delete/invoices", deleteInvoices);

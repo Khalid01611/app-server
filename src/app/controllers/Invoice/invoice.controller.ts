@@ -69,13 +69,6 @@ export const createInvoice = async (req: Request, res: Response): Promise<Respon
       });
     }
 
-    if (!vehicle_no?.trim()) {
-      return res.status(400).send({
-        status: false,
-        message: "Vehicle number is required.",
-      });
-    }
-
     if (!customer_name?.trim()) {
       return res.status(400).send({
         status: false,
