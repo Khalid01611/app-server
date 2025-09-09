@@ -69,6 +69,13 @@ export const createInvoice = async (req: Request, res: Response): Promise<Respon
       });
     }
 
+    if (!vehicle_no?.trim()) {
+      return res.status(400).send({
+        status: false,
+        message: "Vehicle number is required.",
+      });
+    }
+
     if (!customer_name?.trim()) {
       return res.status(400).send({
         status: false,
@@ -554,6 +561,46 @@ export const deleteInvoices = async (req: Request, res: Response): Promise<Respo
     return res.status(500).json({
       status: false,
       message: "Internal server error",
+    });
+  }
+};
+
+export const getCustomerByVehicle = async (req: Request, res: Response): Promise<Response | any> => {
+  try {
+    const { vehicle_no } = req.params;
+
+    if (!vehicle_no?.trim()) {
+      return res.status(400).send({
+        status: false,
+        message: "Vehicle number is required.",
+      });
+    }
+
+    const invoice = await Invoice.findOne({ vehicle_no: vehicle_no.trim() })
+      .sort({ createdAt: -1 })
+      .select("customer_name customer_phone_number vehicle_no")
+      .lean();
+
+    if (!invoice) {
+      return res.status(404).send({
+        status: false,
+        message: "No customer found for this vehicle number.",
+      });
+    }
+
+    return res.status(200).send({
+      status: true,
+      customer: {
+        customer_name: invoice.customer_name,
+        customer_phone_number: invoice.customer_phone_number,
+        vehicle_no: invoice.vehicle_no,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching customer by vehicle:", error);
+    return res.status(500).send({
+      status: false,
+      message: "HTTP 500 Internal Server Error",
     });
   }
 };
