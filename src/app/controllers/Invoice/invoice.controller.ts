@@ -10,7 +10,6 @@ import { sendSMS } from "../../../config/SmsConfig";
 export const createInvoice = async (req: Request, res: Response): Promise<Response | any> => {
   try {
     const {
-      invoice_no,
       date_time,
       vehicle_no,
       customer_name,
@@ -24,13 +23,18 @@ export const createInvoice = async (req: Request, res: Response): Promise<Respon
       is_sent_sms,
     } = req.body;
 
-    // Validation
-    if (!invoice_no?.trim()) {
-      return res.status(400).send({
-        status: false,
-        message: "Invoice number is required.",
-      });
+    // Auto-generate invoice number
+    const lastInvoice = await Invoice.findOne({}, {}, { sort: { 'invoice_no': -1 } });
+    let nextInvoiceNumber = 120; // Default starting number
+    
+    if (lastInvoice && lastInvoice.invoice_no) {
+      const lastNumber = parseInt(lastInvoice.invoice_no);
+      if (!isNaN(lastNumber)) {
+        nextInvoiceNumber = lastNumber + 1;
+      }
     }
+    
+    let invoice_no = nextInvoiceNumber.toString();
 
     if (!date_time) {
       return res.status(400).send({
@@ -118,13 +122,20 @@ export const createInvoice = async (req: Request, res: Response): Promise<Respon
       });
     }
 
-    // Check if invoice number already exists
+    // Ensure uniqueness (double-check in case of concurrent requests)
     const existingInvoice = await Invoice.findOne({ invoice_no });
     if (existingInvoice) {
-      return res.status(400).send({
-        status: false,
-        message: "Invoice number already exists.",
-      });
+      // If collision occurs, try next number
+      const retryNumber = (parseInt(invoice_no) + 1).toString();
+      const retryExists = await Invoice.findOne({ invoice_no: retryNumber });
+      if (retryExists) {
+        return res.status(500).send({
+          status: false,
+          message: "Unable to generate unique invoice number. Please try again.",
+        });
+      }
+      // Use retry number
+      invoice_no = retryNumber;
     }
 
     // Verify product exists
