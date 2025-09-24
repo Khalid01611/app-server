@@ -206,7 +206,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<Response
 export const updateUser = async (req: Request, res: Response): Promise<Response | any> => {
   try {
     const { id } = req.params;
-    const { name, email, password, roles, status, verify_at } = req.body;
+    const { name, email, password, roles, status, verify_at, profile_picture, ...otherFields } = req.body;
 
     if (!Types.ObjectId.isValid(id)) {
       return res.status(400).send({
@@ -215,33 +215,26 @@ export const updateUser = async (req: Request, res: Response): Promise<Response 
       });
     }
 
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).send({
-        status: false,
-        message: "User not found.",
-      });
-    }
+    // Build update object, excluding problematic fields
+    const updateData: any = {};
 
     if (name?.trim()) {
-      user.name = name.trim();
+      updateData.name = name.trim();
     }
 
     if (email?.trim()) {
-      if (email !== user.email) {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          return res.status(400).send({
-            status: false,
-            message: "Email already in use by another user.",
-          });
-        }
-        user.email = email.trim();
+      const existingUser = await User.findOne({ email, _id: { $ne: id } });
+      if (existingUser) {
+        return res.status(400).send({
+          status: false,
+          message: "Email already in use by another user.",
+        });
       }
+      updateData.email = email.trim();
     }
 
     if (password?.trim()) {
-      user.password = await hashPassword(password.trim());
+      updateData.password = await hashPassword(password.trim());
     }
 
     if (roles && Array.isArray(roles)) {
@@ -261,20 +254,46 @@ export const updateUser = async (req: Request, res: Response): Promise<Response 
         });
       }
 
-      user.roles = roles;
+      updateData.roles = roles;
     }
 
     if (status !== undefined) {
-      user.status = status;
+      updateData.status = status;
     }
 
     if (verify_at !== undefined) {
-      user.verify_at = verify_at;
+      updateData.verify_at = verify_at;
     }
 
-    await user.save();
+    // Handle profile_picture safely
+    if (profile_picture !== undefined) {
+      if (typeof profile_picture === 'object' && profile_picture !== null) {
+        updateData.profile_picture = profile_picture.image || null;
+      } else {
+        updateData.profile_picture = profile_picture;
+      }
+    }
 
-    const updatedUser = await User.findById(id).select("-password").populate("roles");
+    // Add other safe fields
+    const safeFields = ['address', 'phone', 'bio', 'date_of_birth', 'profession'];
+    safeFields.forEach(field => {
+      if (otherFields[field] !== undefined) {
+        updateData[field] = otherFields[field];
+      }
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password").populate("roles");
+
+    if (!updatedUser) {
+      return res.status(404).send({
+        status: false,
+        message: "User not found.",
+      });
+    }
 
     return res.status(200).send({
       status: true,
