@@ -79,7 +79,14 @@ export class ChatController {
 
       // Build a public URL: /uploads/chat/<filename>
       const relPath = `/uploads/chat/${path.basename(file.path)}`;
-      const publicUrl = `${req.protocol}://${req.get("host")}${relPath}`;
+      
+      // Fix host for Android emulator - replace localhost with 10.0.2.2
+      let host = req.get("host") || "localhost:8000";
+      if (host.includes("localhost")) {
+        host = host.replace("localhost", "10.0.2.2");
+      }
+      
+      const publicUrl = `${req.protocol}://${host}${relPath}`;
 
       return res.status(201).json({
         success: true,
