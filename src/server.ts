@@ -121,6 +121,5 @@ const socketServer = new SocketServer(server);
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`The server is running on PORT http://localhost:${PORT}`);
-  console.log(`WebSocket server is ready for real-time messaging`);
+
 });

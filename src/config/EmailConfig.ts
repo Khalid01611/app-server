@@ -36,7 +36,7 @@ export const MailSend = async (user: IUser, subject: string, htmlTemplate: strin
     };
 
     const info: SentMessageInfo = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.response);
+
     return info;
   } catch (error: unknown) {
     console.error("Error occurred while sending email:", error instanceof Error ? error.message : "Unknown error");

@@ -48,7 +48,7 @@ export const forgetPassword = async (req: Request, res: Response): Promise<Respo
       message: `Email verification code has been sent.`,
     });
   } catch (error) {
-    console.log(error);
+
     return res.status(500).send({
       status: false,
       message: "HTTP 500 Internal Server Error",
@@ -95,7 +95,6 @@ export const confirmPassword = async (req: Request, res: Response): Promise<Resp
       message: "Password has been reset successfully.",
     });
   } catch (error) {
-    console.log("Error resetting password:", error);
     return res.status(500).send({
       status: false,
       message: "An unexpected error occurred. Please try again later.",
@@ -120,7 +119,6 @@ export const checkResetPasswordToken = async (req: Request, res: Response): Prom
       message: "success",
     });
   } catch (error) {
-    console.log("Error resetting password:", error);
     return res.status(500).send({
       status: false,
       message: "An unexpected error occurred. Please try again later.",

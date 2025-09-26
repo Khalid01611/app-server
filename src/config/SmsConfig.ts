@@ -25,7 +25,7 @@ export async function sendSMS(number: string | string[], message: string) {
       message: message,
     });
 
-    console.log("SMS Sent:", response.data);
+
     return response.data;
   } catch (error: any) {
     console.error("SMS Error:", error.response?.data || error.message);

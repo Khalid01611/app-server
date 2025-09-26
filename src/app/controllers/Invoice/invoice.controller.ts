@@ -197,7 +197,7 @@ export const createInvoice = async (req: Request, res: Response): Promise<Respon
 
     if (is_sent_sms == true) {
       const smsTemplate = await SMSTemplate.findOne({ isActive: true }).sort({ createdAt: -1 }).exec();
-      console.log(smsTemplate);
+
       if (smsTemplate && smsTemplate.body) {
         const message = formatSms(smsTemplate.body, newInvoice);
         await sendSMS(customer_phone_number, message);

@@ -80,7 +80,7 @@ async function main() {
     let permission = await Permission.findOne({ name: perm });
     if (!permission) {
       permission = await Permission.create({ name: perm });
-      console.log(`✅ Created permission: ${perm}`);
+
     }
     permissions.push(permission);
   }
@@ -92,14 +92,14 @@ async function main() {
     let role = await Role.findOne({ name: roleName });
     if (!role) {
       role = await Role.create({ name: roleName, permissions: [] });
-      console.log(`✅ Created role: ${roleName}`);
+
     }
     rolesMap[roleName] = role;
   }
 
   rolesMap["super-admin"].permissions = permissions.map((p) => p._id);
   await rolesMap["super-admin"].save();
-  console.log("🎉 Assigned all permissions to super-admin role");
+
 
   const user = await User.create({
     name,
@@ -109,7 +109,7 @@ async function main() {
     roles: [rolesMap["super-admin"]._id],
   });
 
-  console.log(`🎉 Super admin created: ${user.email}`);
+
   process.exit(0);
 }
 

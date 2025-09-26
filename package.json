@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "build:prod": "NODE_ENV=production tsc",
     "start": "node build/server.js",
+    "start:prod": "NODE_ENV=production node build/server.js",
     "app-config": "ts-node-dev src/scripts/app-config.ts"
   },
   "keywords": [],

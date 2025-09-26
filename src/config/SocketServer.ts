@@ -79,7 +79,7 @@ export class SocketServer {
 
   private setupEventHandlers() {
     this.io.on("connection", (socket: AuthenticatedSocket) => {
-      console.log(`User connected: ${socket.userId}`);
+
 
       // Store user connection (support multiple tabs/devices)
       const current = this.connectedUsers.get(socket.userId!) || new Set<string>();
@@ -413,7 +413,7 @@ export class SocketServer {
 
       // Handle disconnect
       socket.on("disconnect", () => {
-        console.log(`User disconnected: ${socket.userId}`);
+
         const set = this.connectedUsers.get(socket.userId!);
         if (set) {
           set.delete(socket.id);

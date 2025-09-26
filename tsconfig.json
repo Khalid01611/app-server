@@ -6,6 +6,14 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "removeComments": true,
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

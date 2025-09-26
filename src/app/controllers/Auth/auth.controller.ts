@@ -369,7 +369,7 @@ export const updateMyAvatar = async (req: Request, res: Response): Promise<Respo
           const oldPath = path.join(uploadsRoot, 'avatars', oldFilename);
           if (fs.existsSync(oldPath)) {
             fs.unlinkSync(oldPath);
-            console.log(`Deleted old profile picture: ${oldPath}`);
+
           }
         }
       } catch (error) {
