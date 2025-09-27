@@ -75,7 +75,7 @@ export const getReportStats = async (req: Request, res: Response): Promise<Respo
     });
 
     const topProducts = Array.from(productStats.values())
-      .sort((a, b) => b.revenue - a.revenue)
+      .sort((a: any, b: any) => b.revenue - a.revenue)
       .slice(0, 10);
 
     // Payment method statistics
@@ -604,10 +604,10 @@ export const getCustomerAnalysisReport = async (req: Request, res: Response): Pr
 
     // Calculate average order value and convert favorite products to array
     const customerAnalysisArray = Array.from(customerStats.values()).map(stats => {
-      const favoriteProducts = Array.from(stats.favoriteProducts.entries())
-        .sort((a, b) => b[1] - a[1])
+      const favoriteProducts = Array.from(stats.favoriteProducts.entries() as any)
+        .sort((a: any, b: any) => b[1] - a[1])
         .slice(0, 3)
-        .map(([product, quantity]) => ({ product, quantity }));
+        .map(([product, quantity]: any) => ({ product, quantity }));
 
       return {
         customerName: stats.customerName,

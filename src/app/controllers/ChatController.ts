@@ -36,7 +36,7 @@ export class ChatController {
 
       const conversationsWithPresence = conversations.map(conversation => {
         const participantsWithPresence = conversation.participants.map(participant => ({
-          ...participant.toObject(),
+          ...(participant as any).toObject(),
           presence: presenceMap.get(participant._id.toString()) || null
         }));
 
@@ -54,7 +54,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch conversations",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -103,7 +103,7 @@ export class ChatController {
       return res.status(500).json({
         success: false,
         message: "Failed to upload media",
-        error: error.message,
+        error: (error as any).message,
       });
     }
   }
@@ -167,7 +167,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to create conversation",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -220,7 +220,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch messages",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -278,7 +278,7 @@ export class ChatController {
       return res.status(500).json({
         success: false,
         message: "Failed to fetch media",
-        error: error.message,
+        error: (error as any).message,
       });
     }
   }
@@ -313,7 +313,7 @@ export class ChatController {
       );
 
       const participantsWithPresence = conversation.participants.map(participant => ({
-        ...participant.toObject(),
+        ...(participant as any).toObject(),
         presence: presenceMap.get(participant._id.toString()) || null
       }));
 
@@ -330,7 +330,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch conversation",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -377,7 +377,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to update conversation",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -431,7 +431,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to manage participants",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -493,7 +493,7 @@ export class ChatController {
       res.json({ success: true, data: updated });
       return;
     } catch (error: any) {
-      res.status(500).json({ success: false, message: "Failed to update admins", error: error.message });
+      res.status(500).json({ success: false, message: "Failed to update admins", error: (error as any).message });
       return;
     }
   }
@@ -512,7 +512,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch online users",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -550,7 +550,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to search users",
-        error: error.message
+        error: (error as any).message
       });
     }
   }
@@ -577,10 +577,10 @@ export class ChatController {
       }
 
       // Update mute status
-      if (!conversation.mutedBy) {
-        conversation.mutedBy = new Map();
+      if (!(conversation as any).mutedBy) {
+        (conversation as any).mutedBy = {};
       }
-      conversation.mutedBy.set(userId.toString(), mute);
+      (conversation as any).mutedBy[userId.toString()] = mute;
       await conversation.save();
 
       res.status(200).json({
@@ -592,7 +592,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to update mute status",
-        error: error.message,
+        error: (error as any).message,
       });
     }
   }
@@ -621,12 +621,12 @@ export class ChatController {
 
       // Update block status
       if (block) {
-        if (!conversation.blockedBy.includes(userId)) {
-          conversation.blockedBy.push(userId);
+        if (!(conversation as any).blockedBy.includes(userId)) {
+          (conversation as any).blockedBy.push(userId);
         }
       } else {
-        conversation.blockedBy = conversation.blockedBy.filter(
-          (blockedUserId) => blockedUserId.toString() !== userId.toString()
+        (conversation as any).blockedBy = (conversation as any).blockedBy.filter(
+          (blockedUserId: any) => blockedUserId.toString() !== userId.toString()
         );
       }
 
@@ -641,7 +641,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to update block status",
-        error: error.message,
+        error: (error as any).message,
       });
     }
   }
@@ -694,7 +694,7 @@ export class ChatController {
       res.status(500).json({
         success: false,
         message: "Failed to leave group",
-        error: error.message,
+        error: (error as any).message,
       });
     }
   }
@@ -722,7 +722,7 @@ export class ChatController {
       }
       return res.json({ success: true, message: "Conversation hidden" });
     } catch (error: any) {
-      return res.status(500).json({ success: false, message: "Failed to delete conversation", error: error.message });
+      return res.status(500).json({ success: false, message: "Failed to delete conversation", error: (error as any).message });
     }
   }
 }

@@ -49,7 +49,7 @@ const corsOptions: cors.CorsOptions = {
     if (whitelist.length === 0) return callback(new Error("CORS origin not configured"));
     return whitelist.includes(origin) ? callback(null, true) : callback(new Error("Not allowed by CORS"));
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: [
     "Content-Type",
     "Authorization",
@@ -57,6 +57,10 @@ const corsOptions: cors.CorsOptions = {
     "deviceid",
     "Accept",
     "Access-Control-Request-Private-Network",
+    "X-Requested-With",
+    "User-Agent",
+    "Cache-Control",
+    "Pragma",
   ],
   credentials: true,
   optionsSuccessStatus: 204,
@@ -68,6 +72,9 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Private-Network", "true");
   }
+  // Android compatibility headers
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Max-Age", "86400");
   // Ensure caches/proxies vary by Origin to avoid CORS leakage
   res.header("Vary", "Origin");
   next();

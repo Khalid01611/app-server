@@ -24,7 +24,26 @@ export class SocketServer {
   constructor(server: HTTPServer) {
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: ["http://localhost:5173"],
+        origin: (origin, callback) => {
+          // Allow requests with no origin (mobile apps)
+          if (!origin) return callback(null, true);
+          // In development allow any origin
+          if (process.env.NODE_ENV !== "production") {
+            return callback(null, true);
+          }
+          // In production use same whitelist as HTTP CORS
+          const list = [
+            process.env.FRONTEND_HOST || '',
+            process.env.FRONTEND_ORIGIN || '',
+            process.env.ALLOWED_ORIGINS || '',
+          ]
+            .join(',')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const whitelist = Array.from(new Set(list));
+          return whitelist.includes(origin) ? callback(null, true) : callback(null, false);
+        },
         methods: ["GET", "POST"],
         credentials: true,
       },
@@ -607,7 +626,7 @@ export class SocketServer {
     await message.save();
 
     // Update conversation's last message if this was the last message
-    await this.updateConversationLastMessageAfterDelete(message.conversationId, messageId);
+    await this.updateConversationLastMessageAfterDelete(message.conversationId.toString(), messageId);
     
     return message;
   }

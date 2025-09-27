@@ -45,7 +45,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
       }
 
       const existingUser = await User.findOne({ email: email.trim() });
-      if (existingUser && existingUser._id.toString() !== userId.toString()) {
+      if (existingUser && (existingUser._id as any).toString() !== userId.toString()) {
         return res.status(400).send({ 
           status: false, 
           message: 'Email already in use by another user.' 
@@ -140,7 +140,7 @@ export const updateEmail = async (req: Request, res: Response): Promise<Response
 
     // Check if email is already in use by another user
     const existingUser = await User.findOne({ email: email.trim() });
-    if (existingUser && existingUser._id.toString() !== userId.toString()) {
+    if (existingUser && (existingUser._id as any).toString() !== userId.toString()) {
       return res.status(400).send({ 
         status: false, 
         message: 'Email already in use by another user.' 
@@ -158,7 +158,7 @@ export const updateEmail = async (req: Request, res: Response): Promise<Response
     // Update email
     user.email = email.trim();
     // Reset email verification since email changed
-    user.verify_at = null;
+    user.verify_at = null as any;
     
     await user.save();
 
