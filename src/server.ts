@@ -48,6 +48,7 @@ const corsOptions: cors.CorsOptions = {
       return callback(null, true);
     }
     const whitelist = getAllowedOrigins();
+    console.log('CORS check - Origin:', origin, 'Whitelist:', whitelist);
     if (whitelist.length === 0) return callback(new Error("CORS origin not configured"));
     return whitelist.includes(origin) ? callback(null, true) : callback(new Error("Not allowed by CORS"));
   },
@@ -71,8 +72,17 @@ const corsOptions: cors.CorsOptions = {
 // Middleware
 // Add support for Chrome private network preflights when using LAN IPs
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = getAllowedOrigins();
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Private-Network", "true");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,x-refresh-token,deviceid,Accept,Access-Control-Request-Private-Network,X-Requested-With,User-Agent,Cache-Control,Pragma");
   }
   // Android compatibility headers
   res.header("Access-Control-Allow-Credentials", "true");
