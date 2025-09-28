@@ -29,6 +29,8 @@ function getAllowedOrigins(): string[] {
     process.env.FRONTEND_HOST || '',
     process.env.FRONTEND_ORIGIN || '',
     process.env.ALLOWED_ORIGINS || '',
+    'https://app.ddrbit.com',
+    'https://appapi.ddrbit.com',
   ]
     .join(',')
     .split(',')
