@@ -80,13 +80,21 @@ export class ChatController {
       // Build a public URL: /uploads/chat/<filename>
       const relPath = `/uploads/chat/${path.basename(file.path)}`;
       
-      // Fix host for Android emulator - replace localhost with 10.0.2.2
-      let host = req.get("host") || "localhost:8000";
-      if (host.includes("localhost")) {
-        host = host.replace("localhost", "10.0.2.2");
+      // Use HTTPS for production, handle different environments
+      let protocol = 'https';
+      let host = 'appapi.ddrbit.com';
+      
+      // Only use request protocol/host in development
+      if (process.env.NODE_ENV !== 'production') {
+        protocol = req.protocol;
+        host = req.get("host") || "localhost:8000";
+        // Fix host for Android emulator
+        if (host.includes("localhost")) {
+          host = host.replace("localhost", "10.0.2.2");
+        }
       }
       
-      const publicUrl = `${req.protocol}://${host}${relPath}`;
+      const publicUrl = `${protocol}://${host}${relPath}`;
 
       return res.status(201).json({
         success: true,
