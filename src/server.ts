@@ -132,8 +132,23 @@ app.get("/health", (req, res) => {
 });
 
 // Serve uploaded media statically from /uploads
-const UPLOAD_ROOT = process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads");
-app.use("/uploads", express.static(UPLOAD_ROOT));
+// Use absolute path for PM2 compatibility
+const fs = require('fs');
+const UPLOAD_ROOT = process.env.UPLOAD_DIR || path.resolve(process.cwd(), "uploads");
+console.log('Static uploads directory:', UPLOAD_ROOT);
+console.log('Current working directory:', process.cwd());
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
+// Ensure uploads directory exists
+if (!fs.existsSync(UPLOAD_ROOT)) {
+  fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
+  console.log('Created uploads directory:', UPLOAD_ROOT);
+}
+
+app.use("/uploads", express.static(UPLOAD_ROOT, {
+  maxAge: '1d',
+  etag: true
+}));
 
 // Initialize Socket.IO server
 const socketServer = new SocketServer(server);
